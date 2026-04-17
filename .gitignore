@@ -1,0 +1,17 @@
+.build/
+.swiftpm/
+DerivedData/
+*.xcodeproj
+Package.resolved
+
+# Build artifacts
+MacPaper.app/
+*.dmg
+*.pkg
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
