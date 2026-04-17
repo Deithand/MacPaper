@@ -7,8 +7,6 @@ Video, WebGL and shaders rendered cleanly behind your desktop icons — zero Doc
 
 [![CI](https://github.com/Deithand/MacPaper/actions/workflows/ci.yml/badge.svg)](https://github.com/Deithand/MacPaper/actions/workflows/ci.yml)
 [![Release](https://github.com/Deithand/MacPaper/actions/workflows/release.yml/badge.svg)](https://github.com/Deithand/MacPaper/actions/workflows/release.yml)
-[![Latest release](https://img.shields.io/github/v/release/Deithand/MacPaper?sort=semver&display_name=tag)](https://github.com/Deithand/MacPaper/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/Deithand/MacPaper/total.svg)](https://github.com/Deithand/MacPaper/releases)
 [![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-black)](#requirements)
 [![Swift](https://img.shields.io/badge/Swift-5.9-F05138?logo=swift&logoColor=white)](https://swift.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
