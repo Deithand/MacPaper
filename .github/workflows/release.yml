@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and publish release
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Extract version from tag
+        id: ver
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Sync version into Info.plist
+        run: |
+          /usr/bin/sed -i '' "s/<string>0.1.0<\/string>/<string>${{ steps.ver.outputs.version }}<\/string>/" scripts/make-app.sh || true
+
+      - name: Build .app
+        run: ./scripts/make-app.sh
+
+      - name: Build .dmg
+        run: ./scripts/make-dmg.sh
+
+      - name: Build .pkg
+        run: ./scripts/make-pkg.sh
+
+      - name: Compute SHA-256 checksums
+        run: |
+          shasum -a 256 MacPaper-*.dmg MacPaper-*.pkg > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: MacPaper ${{ steps.ver.outputs.version }}
+          generate_release_notes: true
+          files: |
+            MacPaper-*.dmg
+            MacPaper-*.pkg
+            SHA256SUMS.txt
