@@ -745,7 +745,7 @@ struct LicensePanel: View {
         let done: (Result<License.Info, Error>) -> Void = { result in
             switch result {
             case .success: status = loc.t("lic.status.activated")
-                NotificationCenter.default.post(name: .licenseDidChange, object: nil)
+                // License.handle() already posts `.licenseDidChange` on success.
             case .failure(let e): status = "✗ " + e.localizedDescription
             }
         }
