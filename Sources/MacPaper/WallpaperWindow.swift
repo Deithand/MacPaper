@@ -40,6 +40,8 @@ class WallpaperWindow: NSWindow {
         containerView.wantsLayer = true
         containerView.layer = CALayer()
         containerView.layer?.backgroundColor = NSColor.black.cgColor
+        // Required on macOS for CALayer.filters (e.g. CIGaussianBlur) to actually render.
+        containerView.layerUsesCoreImageFilters = true
         contentView = containerView
 
         // Overlay layer (darkening) sits on top of content.
@@ -177,7 +179,7 @@ final class VideoWallpaperWindow: WallpaperWindow {
     }
 
     func applyRate() {
-        player?.rate = Preferences.shared.muted ? Float(Preferences.shared.playbackRate) : Float(Preferences.shared.playbackRate)
+        player?.rate = Float(Preferences.shared.playbackRate)
     }
 
     override func pausePlayback() { player?.pause() }

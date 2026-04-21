@@ -19,7 +19,12 @@ final class LicenseWindowController: NSWindowController, NSTextFieldDelegate {
         super.init(window: win)
         buildUI()
         refreshStatus()
-        License.shared.onChange = { [weak self] in DispatchQueue.main.async { self?.refreshStatus() } }
+        // Subscribe via NotificationCenter so we don't clobber other observers
+        // of `License.shared.onChange` (e.g. AppDelegate's watermark/menu refresh).
+        NotificationCenter.default.addObserver(forName: .licenseDidChange,
+                                               object: nil, queue: .main) { [weak self] _ in
+            self?.refreshStatus()
+        }
     }
 
     required init?(coder: NSCoder) { fatalError() }
@@ -124,8 +129,9 @@ final class LicenseWindowController: NSWindowController, NSTextFieldDelegate {
             self.activateBtn.isEnabled = true
             switch result {
             case .success:
-                self.refreshStatus()
-                NotificationCenter.default.post(name: .licenseDidChange, object: nil)
+                // refreshStatus() will be invoked via the .licenseDidChange
+                // notification posted by License on success.
+                break
             case .failure(let e):
                 self.statusLabel.stringValue = "✗ " + e.localizedDescription
                 self.statusLabel.textColor = .systemRed

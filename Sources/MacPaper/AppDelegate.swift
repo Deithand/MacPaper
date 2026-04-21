@@ -22,16 +22,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         controller.start()
 
         // React to license changes: refresh menu + watermark visibility.
+        // License posts `.licenseDidChange` for every state transition, so a
+        // single NotificationCenter observer covers both activation and
+        // sign-out.
         NotificationCenter.default.addObserver(forName: .licenseDidChange,
                                                object: nil, queue: .main) { [weak self] _ in
             self?.controller.applyLicense()
             self?.rebuildMenu()
-        }
-        License.shared.onChange = { [weak self] in
-            DispatchQueue.main.async {
-                self?.controller.applyLicense()
-                self?.rebuildMenu()
-            }
         }
 
         // Pro gating disabled — no blocking license check at startup.
@@ -310,13 +307,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func openURL() {
         guard let url = promptForURL() else { return }
-        prefs.lastVideoURL = nil
-        // Clear per-screen so global web applies everywhere.
-        prefs.clearAllAssignments()
-        for screen in NSScreen.screens {
-            prefs.setAssignment(ScreenAssignment(kind: .web, value: url.absoluteString), for: screen)
-        }
-        controller.start()
+        controller.setGlobal(source: .web(url))
     }
 
     @objc private func playLibraryItem(_ sender: NSMenuItem) {
@@ -444,9 +435,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     @objc private func showPreferences() { PreferencesWindowController.shared.show() }
     @objc private func buyLicense() { License.shared.openBotBuyLink() }
     @objc private func signOutLicense() {
+        // signOut() posts `.licenseDidChange`, which our observer translates
+        // into applyLicense() + rebuildMenu().
         License.shared.signOut()
-        controller.applyLicense()
-        rebuildMenu()
     }
 
     // MARK: - Pickers / prompts

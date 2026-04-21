@@ -125,11 +125,7 @@ final class PrefsStore: ObservableObject {
         var s = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         if !s.lowercased().hasPrefix("http") { s = "https://" + s }
         guard let url = URL(string: s) else { return }
-        for screen in NSScreen.screens {
-            Preferences.shared.setAssignment(ScreenAssignment(kind: .web, value: url.absoluteString),
-                                             for: screen)
-        }
-        WallpaperController.shared?.start()
+        WallpaperController.shared?.setGlobal(source: .web(url))
         refreshCurrent()
     }
 
@@ -749,7 +745,7 @@ struct LicensePanel: View {
         let done: (Result<License.Info, Error>) -> Void = { result in
             switch result {
             case .success: status = loc.t("lic.status.activated")
-                NotificationCenter.default.post(name: .licenseDidChange, object: nil)
+                // License.handle() already posts `.licenseDidChange` on success.
             case .failure(let e): status = "✗ " + e.localizedDescription
             }
         }
