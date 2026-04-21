@@ -125,11 +125,7 @@ final class PrefsStore: ObservableObject {
         var s = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         if !s.lowercased().hasPrefix("http") { s = "https://" + s }
         guard let url = URL(string: s) else { return }
-        for screen in NSScreen.screens {
-            Preferences.shared.setAssignment(ScreenAssignment(kind: .web, value: url.absoluteString),
-                                             for: screen)
-        }
-        WallpaperController.shared?.start()
+        WallpaperController.shared?.setGlobal(source: .web(url))
         refreshCurrent()
     }
 

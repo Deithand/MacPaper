@@ -310,13 +310,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func openURL() {
         guard let url = promptForURL() else { return }
-        prefs.lastVideoURL = nil
-        // Clear per-screen so global web applies everywhere.
-        prefs.clearAllAssignments()
-        for screen in NSScreen.screens {
-            prefs.setAssignment(ScreenAssignment(kind: .web, value: url.absoluteString), for: screen)
-        }
-        controller.start()
+        controller.setGlobal(source: .web(url))
     }
 
     @objc private func playLibraryItem(_ sender: NSMenuItem) {

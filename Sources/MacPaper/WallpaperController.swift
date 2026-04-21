@@ -31,9 +31,25 @@ final class WallpaperController {
     // MARK: - Global (all screens) apply
 
     func setGlobal(source: WallpaperSource) {
-        // Clears per-screen overrides? Keep them: global is a fallback.
-        if case .video(let url) = source {
+        switch source {
+        case .video(let url):
+            // For videos, persist as the fallback source and let existing
+            // per-screen overrides win. This matches the "global is a fallback"
+            // contract.
             Preferences.shared.lastVideoURL = url
+        case .web(let url):
+            // There is no persistent "global web" slot; emulate one by
+            // assigning the same web source to every screen. Clearing the
+            // video fallback avoids any stale video resurfacing on screens
+            // that later lose their assignment.
+            Preferences.shared.lastVideoURL = nil
+            Preferences.shared.clearAllAssignments()
+            for screen in NSScreen.screens {
+                Preferences.shared.setAssignment(
+                    ScreenAssignment(kind: .web, value: url.absoluteString),
+                    for: screen
+                )
+            }
         }
         rebuildAll()
         onStateChange?()

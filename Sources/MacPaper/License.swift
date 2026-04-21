@@ -88,7 +88,12 @@ final class License {
     func signOut() {
         info = nil
         save()
+        notifyChanged()
+    }
+
+    private func notifyChanged() {
         onChange?()
+        NotificationCenter.default.post(name: .licenseDidChange, object: nil)
     }
 
     // MARK: - Hardware ID
@@ -166,7 +171,7 @@ final class License {
                 )
                 self.info = info
                 self.save()
-                self.onChange?()
+                self.notifyChanged()
                 completion(.success(info))
             }
         }
